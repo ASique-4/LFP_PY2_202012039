@@ -1,3 +1,6 @@
+
+import sys
+from time import sleep
 from prettytable import PrettyTable
 from bases import *
 
@@ -45,8 +48,14 @@ class AnalizadorSintactico:
             self.resultadoDeJornada()
         elif temporal.tipo == 'reservada_PARTIDOS':
             self.TEMPORADA_DE_UN_EQUIPO()
-        elif temporal.tipo == 'reservada_IMPRIMIR':
-            self.IMPRESION()
+        elif temporal.tipo == 'reservada_TABLA':
+            self.TABLA_GENERAL()
+        elif temporal.tipo == 'reservada_TOP':
+            self.TABLA_TOP()
+        elif temporal.tipo == 'reservada_ADIOS':
+            print('Nos vemos luego :D')
+            sleep(5)
+            sys.exit()
         else:
             self.agregarError('reservada_RESULTADO | reservada_JORNADA | reservada_GOLES | reservada_TABLA | reservada_PARTIDOS | reservada_TOP | reservada_ADIOS',temporal.tipo)
 
@@ -549,45 +558,172 @@ class AnalizadorSintactico:
         else:
             self.agregarError("cadena | entero",token.tipo) 
 
-    def IMPRESION(self):
-        # Comando de impresión de tabla en base de datos
-        # Producción
-        #           IMPRESION	::=	pr_imprimir cadena punto cadena      
-        nombre_base = ''
-        nombre_tabla = ''
-        # Sacar token --- se espera reservada_IMPRIMIR
+    def TABLA_GENERAL(self):
+        # Comando de impresión de tabla general
+    
+        archivo = 'temporada'
+        # Sacar token --- se espera reservada_TABLA
         token = self.sacarToken()
-        if token.tipo == 'reservada_IMPRIMIR':
-            # Sacar otro token --- se espera cadena
+        if token.tipo == 'reservada_TABLA':
+            # Sacar otro token --- se espera reservada_TEMPORADA
             token = self.sacarToken()
             if token is None:
-                self.agregarError("cadena","EOF")
+                self.agregarError("reservada_TEMPORADA","EOF")
                 return
-            elif token.tipo == "cadena":
-                nombre_base = token.lexema
-                # Sacar otro token --- se espera punto
+            elif token.tipo == "reservada_TEMPORADA":
+                
+                # Sacar otro token --- se espera menorQue
                 token = self.sacarToken()
                 if token is None:
-                    self.agregarError("punto","EOF")
+                    self.agregarError("menorQue","EOF")
                     return
-                elif token.tipo == "punto":
-                    # Sacar otro token --- se espera cadena
+                elif token.tipo == "menorQue":
+                    # Sacar otro token --- se espera numero
                     token = self.sacarToken()
                     if token is None:
-                        self.agregarError("cadena","EOF")
+                        self.agregarError("numero","EOF")
                         return
-                    elif token.tipo == "cadena":
-                        nombre_tabla = token.lexema
-                        #llamar a funcionalidad de imprimir
-                        imprimir(nombre_tabla,nombre_base)
+                    elif token.tipo == "numero":
+                        fecha1 = token.lexema
+                        # Sacar otro token --- se espera guion
+                        token = self.sacarToken()
+                        if token is None:
+                            self.agregarError("guion","EOF")
+                            return
+                        elif token.tipo == "guion":
+                            # Sacar otro token --- se espera numero
+                            token = self.sacarToken()
+                            if token is None:
+                                self.agregarError("numero","EOF")
+                                return
+                            elif token.tipo == "numero":
+                                fecha2 = token.lexema
+                                # Sacar otro token --- se espera mayorQue
+                                token = self.sacarToken()
+                                if token is None:
+                                    self.agregarError("mayorQue","EOF")
+                                    return
+                                elif token.tipo == "mayorQue":
+                                    # Sacar otro token --- se espera -f
+                                    token = self.sacarToken()
+                                    if token is None:
+                                        tablaGeneral(fecha1,fecha2,archivo)
+                                        return
+                                    elif token.tipo == "-f":
+                                        # Sacar otro token --- se espera cadena
+                                        token = self.sacarToken()
+                                        if token is None:
+                                            self.agregarError("cadena","EOF")
+                                            return
+                                        elif token.tipo == "cadena":
+                                            archivo = token.lexema
+                                            tablaGeneral(fecha1,fecha2,archivo)
+                                        else:
+                                            self.agregarError("cadena",token.tipo)
+                                    else:
+                                        self.agregarError("-f",token.tipo)
+                                else:
+                                    self.agregarError("mayorQue",token.tipo) 
+                            else:
+                                self.agregarError("numero",token.tipo) 
+                        else:
+                            self.agregarError("guion",token.tipo) 
                     else:
-                        self.agregarError("cadena",token.tipo)     
+                        self.agregarError("numero",token.tipo)     
                 else:
-                    self.agregarError("punto",token.tipo)                  
+                    self.agregarError("menorQue",token.tipo)                  
             else:
-                self.agregarError("cadena",token.tipo)           
+                self.agregarError("reservada_TEMPORADA",token.tipo)           
         else:
-            self.agregarError("reservada_IMPRIMIR","EOF")                
+            self.agregarError("reservada_TABLA","EOF")                
+
+    def TABLA_TOP(self):
+            # Comando de impresión de tabla general
+        
+            n = 5
+            # Sacar token --- se espera reservada_TABLA
+            token = self.sacarToken()
+            if token.tipo == 'reservada_TOP':
+                # Sacar otro token --- se espera reservada_SUPERIOR | reservada_INFERIOR
+                token = self.sacarToken()
+                if token is None:
+                    self.agregarError("reservada_SUPERIOR | reservada_INFERIOR","EOF")
+                    return
+                elif token.tipo == "reservada_SUPERIOR" or token.tipo == "reservada_INFERIOR" :
+                    condicion = token.tipo
+                    # Sacar otro token --- se espera reservada_TEMPORADA
+                    token = self.sacarToken()
+                    if token is None:
+                        self.agregarError("reservada_TEMPORADA","EOF")
+                        return
+                    elif token.tipo == "reservada_TEMPORADA":
+                        # Sacar otro token --- se espera menorQue
+                        token = self.sacarToken()
+                        if token is None:
+                            self.agregarError("menorQue","EOF")
+                            return
+                        elif token.tipo == "menorQue":
+                            # Sacar otro token --- se espera numero
+                            token = self.sacarToken()
+                            if token is None:
+                                self.agregarError("numero","EOF")
+                                return
+                            elif token.tipo == "numero":
+                                # Sacar otro token --- se espera guion
+                                fecha1 = token.lexema
+                                token = self.sacarToken()
+                                if token is None:
+                                    self.agregarError("guion","EOF")
+                                    return
+                                elif token.tipo == "guion":
+                                    
+                                    # Sacar otro token --- se espera numero
+                                    token = self.sacarToken()
+                                    if token is None:
+                                        self.agregarError("numero","EOF")
+                                        return
+                                    elif token.tipo == "numero":
+                                        fecha2 = token.lexema
+                                        # Sacar otro token --- se espera mayorQue
+                                        token = self.sacarToken()
+                                        if token is None:
+                                            self.agregarError("mayorQue","EOF")
+                                            return
+                                        elif token.tipo == "mayorQue":
+                                            # Sacar otro token --- se espera -n
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                tablaTop(fecha1,fecha2,n)
+                                                return
+                                            elif token.tipo == "-n":
+                                                # Sacar otro token --- se espera numero
+                                                token = self.sacarToken()
+                                                if token is None:
+                                                    self.agregarError("numero","EOF")
+                                                    return
+                                                elif token.tipo == "numero":
+                                                    n = token.lexema
+                                                    tablaTop(fecha1,fecha2,n)
+                                                else:
+                                                    self.agregarError("numero",token.tipo)
+                                            else:
+                                                self.agregarError("-n",token.tipo)
+                                        else:
+                                            self.agregarError("mayorQue",token.tipo)
+                                    else:
+                                        self.agregarError("numero",token.tipo) 
+                                else:
+                                    self.agregarError("guion",token.tipo) 
+                            else:
+                                self.agregarError("numero",token.tipo) 
+                        else:
+                            self.agregarError("menorQue",token.tipo)     
+                    else:
+                        self.agregarError("reservada_TEMPORADA",token.tipo)                  
+                else:
+                    self.agregarError("reservada_SUPERIOR | reservada_INFERIOR",token.tipo)           
+            else:
+                self.agregarError("reservada_TOP","EOF")       
 
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''

@@ -70,6 +70,125 @@ def obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorFin):
     print('Generando archivo de resultados de temporada {}-{} del {}'.format(fecha1,fecha2,equipo))
     imprimir(archivo,x.get_html_string())
 
+def tablaGeneral(fecha1,fecha2,archivo):
+    datos = (datosPartidos[ (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
+    x = PrettyTable()
+
+    index = 0
+    strE1 = ''
+    strE2 = ''
+    for i in datos['Equipo1']:
+        if datos.iloc[index,5] > datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(3))
+        elif datos.iloc[index,5] == datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(1))
+        elif datos.iloc[index,5] < datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(0))
+        index += 1
+            
+    index = 0
+    for i in datos['Equipo2']:
+        if datos.iloc[index,5] > datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(0))
+        elif datos.iloc[index,5] == datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(1))
+        elif datos.iloc[index,5] < datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(3))
+        index += 1
+    E1 = eval('['+strE1[:-1]+']')
+    E2 = eval('['+strE2[:-1]+']')
+
+    indexj = 0
+    for i in E1:
+        indexj = 0
+        for j in E2:
+            if i[0] == j[0]:
+                i[1] += j[1] 
+                E2.pop(indexj)
+            indexj += 1
+    
+
+    for i in E1:
+        indexj = 0
+        for j in E1:
+            if str(i[0]).lower() == str(j[0]).lower() and i != j:
+                i[1] += j[1]
+                E1.pop(indexj)
+            indexj +=1
+
+    x.field_names = ['Equipo','Puntos']
+    x.add_rows(E1)
+    #print(x)
+    print('Generando archivo de clasificación de temporada {}-{}'.format(fecha1,fecha2))
+    imprimir(archivo,x.get_html_string())
+
+def tablaTop(condicion,fecha1,fecha2,n):
+    datos = (datosPartidos[ (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
+    x = PrettyTable()
+
+    index = 0
+    strE1 = ''
+    strE2 = ''
+    for i in datos['Equipo1']:
+        if datos.iloc[index,5] > datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(3))
+        elif datos.iloc[index,5] == datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(1))
+        elif datos.iloc[index,5] < datos.iloc[index,6]:
+            strE1 += "['{}',{}],".format(i,int(0))
+        index += 1
+            
+    index = 0
+    for i in datos['Equipo2']:
+        if datos.iloc[index,5] > datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(0))
+        elif datos.iloc[index,5] == datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(1))
+        elif datos.iloc[index,5] < datos.iloc[index,6]:
+            strE2 += "['{}',{}],".format(i,int(3))
+        index += 1
+    E1 = eval('['+strE1[:-1]+']')
+    E2 = eval('['+strE2[:-1]+']')
+
+    indexj = 0
+    for i in E1:
+        indexj = 0
+        for j in E2:
+            if i[0] == j[0]:
+                i[1] += j[1] 
+                E2.pop(indexj)
+            indexj += 1
+    
+
+    for i in E1:
+        indexj = 0
+        for j in E1:
+            if str(i[0]).lower() == str(j[0]).lower() and i != j:
+                i[1] += j[1]
+                E1.pop(indexj)
+            indexj +=1
+    
+    if condicion == 'reservada_INFERIOR':
+        E1 = sorted(E1, key=lambda E1: E1[1])
+    if condicion == 'reservada_SUPERIOR':
+        E1 = sorted(E1, key=lambda E1: E1[1], reverse=True)
+
+    x.field_names = ['Posicion','Equipo','Puntos']
+    i = 1
+    while n >= i:
+        filas += "[{},'{}',{}],".format(i,E1[i][0],E1[i][1])
+        i += 1
+    filas = eval('['+filas[:-1]+']')
+    x.add_rows(filas)
+    if condicion == 'reservada_INFERIOR':
+        print('El top inferior de la temporada {}-{} fue: '.format(fecha1,fecha2))
+        print(x)
+    if condicion == 'reservada_SUPERIOR':
+        print('El top superior de la temporada {}-{} fue: '.format(fecha1,fecha2))
+        print(x)
+        
+
+
 def insertar(tabla,base,registro):
     cadena = ''
     with open("bases.txt",'r+') as file:
