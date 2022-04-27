@@ -11,7 +11,7 @@ layout = [[sg.Text('Your output will go here', size=(40, 1))],
         sg.Button('EXIT', button_color=(sg.YELLOWS[0], sg.GREENS[0]))]]
 
 window = sg.Window('Chat window', layout, font=('Helvetica', ' 13'), default_button_element_size=(8,2), use_default_focus=False)
-
+#PARTIDOS "Real Madrid" TEMPORADA <1999-2000> -ji 1 -jf 18
 while True:     
     event, value = window.read()
     if event in (sg.WIN_CLOSED, 'EXIT'): 
@@ -20,12 +20,14 @@ while True:
         query = value['-QUERY-'].rstrip()
         print(query + '\n')
         lexico = AnalizadorLexico()
+        
 
         cadena = query
 
 
         lexico.analizar(cadena)
-        #lexico.imprimirTokens()
+        lexico.imprimirTokens()
+        lexico.imprimirErrores()
 
         #Guardar lista de tokens
         listaTokens = lexico.listaTokens
@@ -34,7 +36,7 @@ while True:
         #Análisis sintáctico
         sintactico = AnalizadorSintactico(listaTokens)
         sintactico.analizar()
-        #sintactico.imprimirErrores()
+        sintactico.imprimirErrores()
 
         
 

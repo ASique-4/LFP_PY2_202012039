@@ -40,20 +40,19 @@ class AnalizadorSintactico:
         if temporal is None:
             self.agregarError('reservada_RESULTADO | reservada_JORNADA | reservada_GOLES | reservada_TABLA | reservada_PARTIDOS | reservada_TOP | reservada_ADIOS',"EOF")
         elif temporal.tipo == 'reservada_RESULTADO':
-            self.OBTENER_RESULTADO()
-        elif temporal.tipo == 'reservada_EN':
-            self.CREACIONTABLA()
-        elif temporal.tipo == 'reservada_INSERTAR':
-            self.INSERCION()
+            self.resultadoDePartido()
+        elif temporal.tipo == 'reservada_JORNADA':
+            self.resultadoDeJornada()
+        elif temporal.tipo == 'reservada_PARTIDOS':
+            self.TEMPORADA_DE_UN_EQUIPO()
         elif temporal.tipo == 'reservada_IMPRIMIR':
             self.IMPRESION()
         else:
             self.agregarError('reservada_RESULTADO | reservada_JORNADA | reservada_GOLES | reservada_TABLA | reservada_PARTIDOS | reservada_TOP | reservada_ADIOS',temporal.tipo)
 
-    def OBTENER_RESULTADO(self):
-        # Comando de creación de base de datos
-        # Producción
-        #           CREACIONBASE	::=	pr_crear pr_base cadena
+    def resultadoDePartido(self):
+        # Comando para obtener resultado de un partido
+
 
         # Sacar token --- se espera reservada_RESULTADO
         token = self.sacarToken()
@@ -121,7 +120,7 @@ class AnalizadorSintactico:
                                                 return
                                             elif token.tipo == "mayorQue":
                                                 #Llamo a mi funcionalidad
-                                                RESULTADO(equipo2,equipo1,fecha1,fecha2)
+                                                obtenerResultadoDePartido(equipo2,equipo1,fecha1,fecha2)
                                                 
                                             else:
                                                 self.agregarError("mayorQue",token.tipo)
@@ -148,127 +147,340 @@ class AnalizadorSintactico:
         
 
 
-    def CREACIONTABLA(self):
-        # Comando de creación de tabla en base de datos
-        # Producción
-        #           CREACIONTABLA	::=	pr_en cadena pr_crear pr_tabla cadena
+    def resultadoDeJornada(self):
+        # Comando para obtener resultado de jornada
 
-        nombre_base = ''
-        nombre_tabla = ''
-        # Sacar token --- se espera reservada_EN
+        # Sacar token --- se espera reservada_JORNADA
         token = self.sacarToken()
-        if token.tipo == 'reservada_EN':
+        if token.tipo == 'reservada_JORNADA':
+            # Sacar otro token --- se espera numero
+            token = self.sacarToken()
+            if token is None:
+                self.agregarError("numero","EOF")
+                return
+            elif token.tipo == "numero":
+                jornada = token.lexema
+                # Sacar otro token --- se espera reservada_TEMPORADA
+                token = self.sacarToken()
+                if token is None:
+                    self.agregarError("reservada_TEMPORADA","EOF")
+                    return
+                elif token.tipo == "reservada_TEMPORADA":
+                    
+                    # Sacar otro token --- se espera menorQue
+                    token = self.sacarToken()
+                    if token is None:
+                        self.agregarError("menorQue","EOF")
+                        return
+                    elif token.tipo == "menorQue":
+                        # Sacar otro token --- se espera numero
+                        token = self.sacarToken()
+                        if token is None:
+                            self.agregarError("numero","EOF")
+                            return
+                        elif token.tipo == "numero":
+                            fecha1 = token.lexema
+                            # Sacar otro token --- se espera guion
+                            token = self.sacarToken()
+                            if token is None:
+                                self.agregarError("guion","EOF")
+                                return
+                            elif token.tipo == "guion":
+                                # Sacar otro token --- se espera numero
+                                token = self.sacarToken()
+                                if token is None:
+                                    self.agregarError("numero","EOF")
+                                    return
+                                elif token.tipo == "numero":
+                                    fecha2 = token.lexema
+                                    # Sacar otro token --- se espera mayorQue
+                                    token = self.sacarToken()
+                                    if token is None:
+                                        self.agregarError("mayorQue","EOF")
+                                        return
+                                    elif token.tipo == "mayorQue":
+                                        # Sacar otro token --- se espera -f
+                                        token = self.sacarToken()
+                                        if token is None:
+                                            obtenerResultadoDeJornada(jornada,fecha1,fecha2,'jornada')
+                                            return
+                                        elif token.tipo == "-f":
+                                            
+                                            # Sacar otro token --- se espera cadena
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                self.agregarError("cadena","EOF")
+                                                return
+                                            elif token.tipo == "cadena":
+                                                archivo = token.lexema
+                                                obtenerResultadoDeJornada(jornada,fecha1,fecha2,archivo)
+                                            else:
+                                                self.agregarError("cadena",token.tipo)
+                                        else:
+                                            self.agregarError("-f",token.tipo)
+                                    else:
+                                        self.agregarError("mayorQue",token.tipo)
+                                else:
+                                    self.agregarError("numero",token.tipo)
+                            else:
+                                self.agregarError("guion",token.tipo)
+                        else:
+                            self.agregarError("numero",token.tipo)   
+                    else:
+                        self.agregarError("menorQue",token.tipo)                    
+                else:
+                    self.agregarError("reservada_TEMPORADA",token.tipo)
+            else:
+                self.agregarError("numero",token.tipo)
+        else:
+            self.agregarError("reservada_JORNADA","EOF")        
+
+
+    def TEMPORADA_DE_UN_EQUIPO(self):
+        archivo = 'partidos'
+        jorfin = 'No'
+        jorIni = 'No'
+        # Sacar token --- se espera reservada_PARTIDOS
+        token = self.sacarToken()
+        if token.tipo == 'reservada_PARTIDOS':
             # Sacar otro token --- se espera cadena
             token = self.sacarToken()
             if token is None:
-                self.agregarError("cadena","EOF")
+                self.agregarError("reservada_EQUIPO","EOF")
                 return
-            elif token.tipo == "cadena":
-                nombre_base = token.lexema
-                # Sacar otro token --- se espera reservada_RESULTADO
+            elif token.tipo == "cadena" :
+                equipo = token.lexema
+                # Sacar otro token --- se espera reservada_TEMPORADA
                 token = self.sacarToken()
                 if token is None:
-                    self.agregarError("reservada_RESULTADO","EOF")
+                    self.agregarError("reservada_TEMPORADA","EOF")
                     return
-                elif token.tipo == "reservada_RESULTADO":
-                    # Sacar otro token --- se espera reservada_TABLA
+                elif token.tipo == "reservada_TEMPORADA":
+                    # Sacar otro token --- se espera menorQue
                     token = self.sacarToken()
                     if token is None:
-                        self.agregarError("reservada_TABLA","EOF")
+                        self.agregarError("menorQue","EOF")
                         return
-                    elif token.tipo == "reservada_TABLA":
-                        # Sacar otro token --- se espera cadena
+                    elif token.tipo == "menorQue":
+                        # Sacar otro token --- se espera numero
                         token = self.sacarToken()
                         if token is None:
-                            self.agregarError("cadena","EOF")
+                            self.agregarError("numero","EOF")
                             return
-                        elif token.tipo == "cadena":
-                            nombre_tabla = token.lexema
-                            #FUncionalidad
-                            createTable(nombre_tabla,nombre_base)
-                        else:
-                            self.agregarError("cadena",token.tipo)   
-                    else:
-                        self.agregarError("reservada_TABLA",token.tipo)                    
-                else:
-                    self.agregarError("reservada_RESULTADO",token.tipo)
-            else:
-                self.agregarError("reservada_BASE",token.tipo)
-        else:
-            self.agregarError("reservada_EN","EOF")        
-
-
-    def INSERCION(self):
-        # Producción
-        #INSERCION	::=	pr_insertar parentesisIzquierdo LISTA parentesisDerecho pr_en cadena punto cadena
-        
-        lista = None
-        nombre_base = ''
-        nombre_tabla = ''
-
-        # Sacar token --- se espera reservada_INSERTAR
-        token = self.sacarToken()
-        if token.tipo == 'reservada_INSERTAR':
-            # Sacar otro token --- se espera parentesisIzquierdo
-            token = self.sacarToken()
-            if token is None:
-                self.agregarError("parentesisIzquierdo","EOF")
-                return
-            elif token.tipo == "parentesisIzquierdo":
-                # Toca visitar NO TERMINAL -> LISTA
-                # En lista espero un objeto python tipo lista []
-                # Si recibo None quiere decir que hubo errores
-                # Entonces retorno y no ejecuto nada
-                lista = self.LISTA()
-                if lista is None:
-                    return
-                # Sacar otro token --- se espera parentesisDerecho
-                token = self.sacarToken()
-                if token is None:
-                    self.agregarError("parentesisDerecho","EOF")
-                    return
-                elif token.tipo == "parentesisDerecho":
-                    # Sacar otro token --- se espera reservada_EN
-                    token = self.sacarToken()
-                    if token is None:
-                        self.agregarError("reservada_EN","EOF")
-                        return
-                    elif token.tipo == "reservada_EN":
-                        # Sacar otro token --- se espera cadena
-                        token = self.sacarToken()
-                        if token is None:
-                            self.agregarError("cadena","EOF")
-                            return
-                        elif token.tipo == "cadena":
-                            nombre_base = token.lexema
-                            # Sacar otro token --- se espera punto
+                        elif token.tipo == "numero":
+                            fecha1 = token.lexema
+                            # Sacar otro token --- se espera guion
                             token = self.sacarToken()
                             if token is None:
-                                self.agregarError("punto","EOF")
+                                self.agregarError("guion","EOF")
                                 return
-                            elif token.tipo == "punto":
-                                # Sacar otro token --- se espera cadena
+                            elif token.tipo == "guion":
+                                # Sacar otro token --- se espera numero
                                 token = self.sacarToken()
                                 if token is None:
-                                    self.agregarError("cadena","EOF")
+                                    self.agregarError("numero","EOF")
                                     return
-                                elif token.tipo == "cadena":
-                                    nombre_tabla = token.lexema
-                                    insertar(nombre_tabla,nombre_base,lista)
+                                elif token.tipo == "numero":
+                                    fecha2 = token.lexema
+                                    # Sacar otro token --- se espera mayorQue
+                                    token = self.sacarToken()
+                                    if token is None:
+                                        self.agregarError("mayorQue","EOF")
+                                        return
+                                    elif token.tipo == "mayorQue":
+                                        # Sacar otro token --- se espera -f
+                                        token = self.sacarToken()
+                                        if token is None:
+                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                            return
+                                        elif token.tipo == "-f":
+                                            # Sacar otro token --- se espera cadena
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                self.agregarError("cadena","EOF")
+                                                return
+                                            elif token.tipo == "cadena":
+                                                archivo = token.lexema
+                                                token = self.sacarToken()
+                                                if token.tipo == "-ji":
+                                                    # Sacar otro token --- se espera numero
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("cadena","EOF")
+                                                        return
+                                                    elif token.tipo == "numero":
+                                                        jorIni = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token.tipo == "-jf":
+                                                            # Sacar otro token --- se espera numero
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("numero","EOF")
+                                                                return
+                                                            elif token.tipo == "numero":
+                                                                jorfin = token.lexema
+                                                                token = self.sacarToken()
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("cadena",token.tipo)
+                                                    else:
+                                                        self.agregarError("cadena",token.tipo)
+                                                elif token.tipo == "-jf":
+                                                    
+                                                    # Sacar otro token --- se espera numero
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("cadena","EOF")
+                                                        return
+                                                    elif token.tipo == "numero":
+                                                        jorfin = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token.tipo == "-ji":
+                                                    
+                                                            # Sacar otro token --- se espera numero
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("numero","EOF")
+                                                                return
+                                                            elif token.tipo == "numero":
+                                                                jorIni = token.lexema
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("numero",token.tipo)
+                                                    else:
+                                                        self.agregarError("cadena",token.tipo)
+                                            else:
+                                                self.agregarError("cadena",token.tipo)
+                                        elif token.tipo == "-ji":
+                                            # Sacar otro token --- se espera numero
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                self.agregarError("numero","EOF")
+                                                return
+                                            elif token.tipo == "numero":
+                                                jorIni = token.lexema
+                                                token = self.sacarToken()
+                                                if token.tipo == "-f":
+                                                    # Sacar otro token --- se espera cadena
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("cadena","EOF")
+                                                        return
+                                                    elif token.tipo == "cadena":
+                                                        archivo = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token.tipo == "-jf":
+                                                            # Sacar otro token --- se espera numero
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("numero","EOF")
+                                                                return
+                                                            elif token.tipo == "numero":
+                                                                jorfin = token.lexema
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("numero",token.tipo)
+                                                    else:
+                                                        self.agregarError("cadena",token.tipo)
+                                                elif token.tipo == "-jf":
+                                                    
+                                                    # Sacar otro token --- se espera numero
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("numero","EOF")
+                                                        return
+                                                    elif token.tipo == "numero":
+                                                        jorfin = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
+                                                        elif token.tipo == "-f":
+                                                    
+                                                            # Sacar otro token --- se espera cadena
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("cadena","EOF")
+                                                                return
+                                                            elif token.tipo == "cadena":
+                                                                archivo = token.lexema
+                                                                token = self.sacarToken()
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("cadena",token.tipo)
+                                                    else:
+                                                        self.agregarError("numero",token.tipo)
+                                        elif token.tipo == "-jf":
+                                            # Sacar otro token --- se espera numero
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                self.agregarError("numero","EOF")
+                                                return
+                                            elif token.tipo == "numero":
+                                                archivo = token.lexema
+                                                if token.tipo == "-f":
+                                                    # Sacar otro token --- se espera cadena
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("cadena","EOF")
+                                                        return
+                                                    elif token.tipo == "cadena":
+                                                        archivo = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token.tipo == "-ji":
+                                                            # Sacar otro token --- se espera numero
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("numero","EOF")
+                                                                return
+                                                            elif token.tipo == "numero":
+                                                                jorIni = token.lexema
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("numero",token.tipo)
+                                                    else:
+                                                        self.agregarError("cadena",token.tipo)
+                                                elif token.tipo == "-ji":
+                                                    
+                                                    # Sacar otro token --- se espera numero
+                                                    token = self.sacarToken()
+                                                    if token is None:
+                                                        self.agregarError("numero","EOF")
+                                                        return
+                                                    elif token.tipo == "numero":
+                                                        jorIni = token.lexema
+                                                        token = self.sacarToken()
+                                                        if token.tipo == "-f":
+                                                    
+                                                            # Sacar otro token --- se espera cadena
+                                                            token = self.sacarToken()
+                                                            if token is None:
+                                                                self.agregarError("cadena","EOF")
+                                                                return
+                                                            elif token.tipo == "cadena":
+                                                                archivo = token.lexema
+                                                                obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            else:
+                                                                self.agregarError("cadena",token.tipo)
+                                                    else:
+                                                        self.agregarError("numero",token.tipo)
+                                    else:
+                                        self.agregarError("mayorQue",token.tipo) 
                                 else:
-                                    self.agregarError("cadena",token.tipo)     
+                                    self.agregarError("numero",token.tipo)
                             else:
-                                self.agregarError("punto",token.tipo)                  
+                                self.agregarError("guion",token.tipo)
                         else:
-                            self.agregarError("cadena",token.tipo)                             
+                            self.agregarError("numero",token.tipo)                             
                     else:
-                        self.agregarError("reservada_EN",token.tipo)                     
+                        self.agregarError("menorQue",token.tipo)                     
                 else:
-                    self.agregarError("parentesisDerecho",token.tipo)                         
+                    self.agregarError("reservada_TEMPORADA",token.tipo)                         
             else:
-                self.agregarError("parentesisIzquierdo",token.tipo)          
+                self.agregarError("cadena",token.tipo)          
         else:
-            self.agregarError("reservada_INSERTAR","EOF")                
+            self.agregarError("cadena","EOF")                
+
 
     def LISTA(self):
         # Producción

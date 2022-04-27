@@ -24,7 +24,7 @@ class AnalizadorLexico:
         self.listaErrores.append(Error('Lexema ' + caracter + ' no reconocido en el lenguaje.', linea, columna))
         self.buffer = ''
 
-    def s0(self,caracter : str):
+    def s0(self,caracter : str,cadena):
         '''Estado S0'''
         if caracter.isalpha():
             self.estado = 1
@@ -46,7 +46,25 @@ class AnalizadorLexico:
             self.estado = 6
             self.buffer += caracter
             self.columna += 1
-            self.simbolo = 'mayorQue'                        
+            self.simbolo = 'mayorQue'      
+        elif caracter == '-' and cadena[self.i + 1] != None and cadena[self.i + 1] == 'f':
+            self.estado = 6
+            self.buffer += caracter + cadena[self.i + 1]
+            self.columna += 1
+            self.i += 1
+            self.simbolo = '-f'
+        elif caracter == '-' and cadena[self.i + 1] != None and cadena[self.i + 1] == 'j' and cadena[self.i + 2] != None and cadena[self.i + 2] == 'f':
+            self.estado = 6
+            self.buffer += caracter + cadena[self.i + 1] + cadena[self.i + 2]
+            self.columna += 1
+            self.i += 2
+            self.simbolo = '-jf'
+        elif caracter == '-' and cadena[self.i + 1] != None and cadena[self.i + 1] == 'j' and cadena[self.i + 2] != None and cadena[self.i + 2] == 'i':
+            self.estado = 6
+            self.buffer += caracter + cadena[self.i + 1] + cadena[self.i + 2]
+            self.columna += 1
+            self.i += 2
+            self.simbolo = '-ji'    
         elif caracter == '-':
             self.estado = 6
             self.buffer += caracter
@@ -77,7 +95,7 @@ class AnalizadorLexico:
                 self.estado = 0
                 self.i -= 1
             else:
-                self.agregar_error(self.buffer,self.linea,self.columna)
+                self.agregar_token(self.buffer,self.linea,self.columna,'cadena')
                 self.columna += 1
                 self.estado = 0
                 self.i -= 1
@@ -124,7 +142,7 @@ class AnalizadorLexico:
         '''Estado S4'''
         tmp = int(self.i)
         if cadena[self.i-1] == '<' or cadena[self.i-1] == '-' or cadena[self.i-1].isdigit():
-            while cadena[tmp] != '>' and cadena[tmp] != '-':
+            while cadena[tmp] != '>' and cadena[tmp] != '-' and cadena[tmp] != ' ' and cadena[tmp] != '\n' and cadena[tmp] != '$':
                 if cadena[tmp] == '\n':
                     self.agregar_error('> | -'+self.buffer,self.linea,self.columna)
                     self.estado = 0        
@@ -140,7 +158,7 @@ class AnalizadorLexico:
         self.estado = 0        
         self.i += tmp-self.i-1
 
-    def s6(self,caracter : str):
+    def s6(self,cadena : str):
         '''Estado S6'''
         self.agregar_token(self.buffer,self.linea,self.columna,self.simbolo)
         self.estado = 0
@@ -155,7 +173,7 @@ class AnalizadorLexico:
         self.i = 0
         while self.i < len(cadena):
             if self.estado == 0:
-                self.s0(cadena[self.i])
+                self.s0(cadena[self.i],cadena)
             elif self.estado == 1:
                 self.s1(cadena[self.i])
             elif self.estado == 2:

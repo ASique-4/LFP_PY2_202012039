@@ -1,10 +1,11 @@
 from ast import Pass
 import json
+import webbrowser
 import pandas as pd
 from prettytable import PrettyTable
 
 datosPartidos = pd.read_csv('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/[LFP]Proyecto2_202012039/LFP_PY2_202012039/LaLigaBot-LFP.csv')
-def RESULTADO(equipo1,equipo2,fecha1,fecha2):
+def obtenerResultadoDePartido(equipo1,equipo2,fecha1,fecha2):
     datos = (datosPartidos[(datosPartidos['Equipo1'] == equipo1) & (datosPartidos['Equipo2'] == equipo2) & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
     tmpEquipo1 = datos.iloc[0,3]
     tmpEquipo2 = datos.iloc[0,4]
@@ -13,14 +14,61 @@ def RESULTADO(equipo1,equipo2,fecha1,fecha2):
     print('El resultado de este partido fue: {} {} - {} {}'.format(tmpEquipo1,tmpGol1,tmpEquipo2,tmpGol2))
 
 
-def createTable(nombre,base):
-    cadena = ''
-    with open("bases.txt",'r+') as file:
-        diccionario = json.loads(file.read())
-        diccionario["bases"][base][nombre] = []
-        cadena = json.dumps(diccionario)
-    escribir(cadena)
-    print("Se creó en la base de datos",base,"la tabla",nombre)
+def obtenerResultadoDeJornada(jornada,fecha1,fecha2,archivo):
+    datos = (datosPartidos[(datosPartidos['Jornada'] == int(jornada)) & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
+    columnas = []
+    x = PrettyTable()
+    filas = []
+
+    for j in datos.columns:
+        filastxt = ''
+        columnas.append(j)
+        for i in datos[j]:
+            filastxt += "'"+str(i)+"'" + ','
+
+        filastxt[:-1]
+        filastxt = "["+filastxt+"]"
+        tmpfilas = eval(filastxt)
+        filas.append(tmpfilas)
+    index = 0
+    for i in columnas:
+        x.add_column(i,filas[index])
+        index += 1
+
+    print('Generando archivo de resultados jornada {} temporada {}-{}'.format(jornada,fecha1,fecha2))
+    imprimir(archivo,x.get_html_string())
+
+def obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorFin):
+    
+    if jorIni != 'No' and jorFin == 'No':
+        datos = (datosPartidos[((datosPartidos['Equipo1'] == str(equipo)) |  (datosPartidos['Equipo2'] == str(equipo)))  & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2))) & (datosPartidos['Jornada'] >= int(jorIni))])
+    elif jorFin != 'No' and jorIni == 'No':
+        datos = (datosPartidos[((datosPartidos['Equipo1'] == str(equipo)) |  (datosPartidos['Equipo2'] == str(equipo))) & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2))) & (datosPartidos['Jornada'] <= int(jorFin))])
+    elif jorFin != 'No' and jorIni != 'No':
+        datos = (datosPartidos[((datosPartidos['Equipo1'] == str(equipo)) |  (datosPartidos['Equipo2'] == str(equipo)))  & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2))) & (datosPartidos['Jornada'] >= int(jorIni)) & (datosPartidos['Jornada'] <= int(jorFin))])
+    else:
+        datos = (datosPartidos[((datosPartidos['Equipo1'] == str(equipo)) |  (datosPartidos['Equipo2'] == str(equipo)))  & (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
+    columnas = []
+    x = PrettyTable()
+    filas = []
+
+    for j in datos.columns:
+        filastxt = ''
+        columnas.append(j)
+        for i in datos[j]:
+            filastxt += "'"+str(i)+"'" + ','
+
+        filastxt[:-1]
+        filastxt = "["+filastxt+"]"
+        tmpfilas = eval(filastxt)
+        filas.append(tmpfilas)
+    index = 0
+    for i in columnas:
+        x.add_column(i,filas[index])
+        index += 1
+    print(x)
+    print('Generando archivo de resultados de temporada {}-{} del {}'.format(fecha1,fecha2,equipo))
+    imprimir(archivo,x.get_html_string())
 
 def insertar(tabla,base,registro):
     cadena = ''
@@ -35,12 +83,30 @@ def escribir(cadena):
     with open("bases.txt",'w') as file:
         file.write(cadena)
 
-def imprimir(tabla,base):
-    print("Imprimiendo tabla",tabla,"de la base",base)
-    lista = []
-    with open("bases.txt",'r') as file:
-        lista = json.loads(file.read())["bases"][base][tabla]
-    x = PrettyTable()
-    for registro in lista:
-        x.add_row(registro)
-    print(x) 
+def imprimir(archivo,tabla):
+    '''Imprime una tabla en HTML'''
+    strARCHIVO = open(archivo+'.html','w')
+    strHTML = '''<!DOCTYPE html>
+                <html>
+                    <head><title>'''+archivo+'''</title></head>
+                    <style>
+                    table, th, td {
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                    }
+
+                    th:nth-child(even),td:nth-child(even) {
+                    background-color: #D6EEEE;
+                    }
+                    </style>
+                    <body>
+                        
+                            '''
+
+    strHTML += tabla
+    strHTML += '''    
+                    </body>
+                </html>'''
+    strARCHIVO.write(strHTML)
+    strARCHIVO.close()
+    webbrowser.open(archivo+'.html')
