@@ -4,6 +4,7 @@ from Error import Error
 from prettytable import PrettyTable
 
 class AnalizadorLexico:
+
     
     def __init__(self) -> None:
         self.listaTokens  = []
@@ -14,6 +15,15 @@ class AnalizadorLexico:
         self.estado = 0
         self.simbolo = ''
         self.i = 0
+    
+    def limpiartokens(self):
+        x = PrettyTable()
+        x.field_names = ["Lexema","Linea","Columna","Tipo"]
+        
+
+    def limpiarErrores(self):
+        x1 = PrettyTable()
+        x1.field_names = ["Descripcion"]
 
     def agregar_token(self,caracter,linea,columna,token):
         self.listaTokens.append(Token(caracter,linea,columna,token))
@@ -204,8 +214,8 @@ class AnalizadorLexico:
 
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
-        x = PrettyTable()
-        x.field_names = ["Descripcion"]
+        x1 = PrettyTable()
+        x1.field_names = ["Descripción"]
         for error_ in self.listaErrores:
-            x.add_row([error_.descripcion])
-        return x.get_html_string()
+            x1.add_row([error_.descripcion])
+        return x1.get_html_string()

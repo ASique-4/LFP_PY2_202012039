@@ -132,7 +132,8 @@ class AnalizadorSintactico:
                                             elif token.tipo == "mayorQue":
                                                 #Llamo a mi funcionalidad
                                                 obtenerResultadoDePartido(equipo2,equipo1,fecha1,fecha2)
-                                                
+                                                if token is not None:
+                                                    self.agregarError("EOF",token.tipo)
                                             else:
                                                 self.agregarError("mayorQue",token.tipo)
                                         else:
@@ -214,6 +215,8 @@ class AnalizadorSintactico:
                                         token = self.sacarToken()
                                         if token is None:
                                             obtenerResultadoDeJornada(jornada,fecha1,fecha2,'jornada')
+                                            if token is not None:
+                                                self.agregarError("EOF",token.tipo)
                                             return
                                         elif token.tipo == "-f":
                                             
@@ -225,6 +228,8 @@ class AnalizadorSintactico:
                                             elif token.tipo == "cadena":
                                                 archivo = token.lexema
                                                 obtenerResultadoDeJornada(jornada,fecha1,fecha2,archivo)
+                                                if token is not None:
+                                                    self.agregarError("EOF",token.tipo)
                                             else:
                                                 self.agregarError("cadena",token.tipo)
                                         else:
@@ -303,6 +308,8 @@ class AnalizadorSintactico:
                                         token = self.sacarToken()
                                         if token is None:
                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                            if token is not None:
+                                                self.agregarError("EOF",token.tipo)
                                             return
                                         elif token.tipo == "-f":
                                             # Sacar otro token --- se espera cadena
@@ -315,6 +322,8 @@ class AnalizadorSintactico:
                                                 token = self.sacarToken()
                                                 if token is None:
                                                     obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    if token is not None:
+                                                        self.agregarError("EOF",token.tipo)
                                                     return
                                                 elif token.tipo == "-ji":
                                                     # Sacar otro token --- se espera numero
@@ -327,6 +336,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         if token.tipo == "-jf":
                                                             # Sacar otro token --- se espera numero
@@ -338,6 +349,8 @@ class AnalizadorSintactico:
                                                                 jorfin = token.lexema
                                                                 token = self.sacarToken()
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
@@ -355,6 +368,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         if token.tipo == "-ji":
                                                     
@@ -366,6 +381,8 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorIni = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
@@ -384,6 +401,8 @@ class AnalizadorSintactico:
                                                 token = self.sacarToken()
                                                 if token is None:
                                                     obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    if token is not None:
+                                                        self.agregarError("EOF",token.tipo)
                                                     return
                                                 if token.tipo == "-f":
                                                     # Sacar otro token --- se espera cadena
@@ -396,6 +415,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         if token.tipo == "-jf":
                                                             # Sacar otro token --- se espera numero
@@ -406,6 +427,8 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorfin = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
@@ -423,6 +446,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         elif token.tipo == "-f":
                                                     
@@ -435,6 +460,8 @@ class AnalizadorSintactico:
                                                                 archivo = token.lexema
                                                                 token = self.sacarToken()
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("cadena",token.tipo)
@@ -451,6 +478,8 @@ class AnalizadorSintactico:
                                                 token = self.sacarToken()
                                                 if token is None:
                                                     obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    if token is not None:
+                                                        self.agregarError("EOF",token.tipo)
                                                     return
                                                 if token.tipo == "-f":
                                                     # Sacar otro token --- se espera cadena
@@ -463,6 +492,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         if token.tipo == "-ji":
                                                             # Sacar otro token --- se espera numero
@@ -473,6 +504,8 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorIni = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
@@ -490,6 +523,8 @@ class AnalizadorSintactico:
                                                         token = self.sacarToken()
                                                         if token is None:
                                                             obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            if token is not None:
+                                                                self.agregarError("EOF",token.tipo)
                                                             return
                                                         if token.tipo == "-f":
                                                     
@@ -501,6 +536,8 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "cadena":
                                                                 archivo = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                if token is not None:
+                                                                    self.agregarError("EOF",token.tipo)
                                                                 return
                                                             else:
                                                                 self.agregarError("cadena",token.tipo)
@@ -574,6 +611,8 @@ class AnalizadorSintactico:
                                     token = self.sacarToken()
                                     if token is None:
                                         tablaGeneral(fecha1,fecha2,archivo)
+                                        if token is not None:
+                                            self.agregarError("EOF",token.tipo)
                                         return
                                     elif token.tipo == "-f":
                                         # Sacar otro token --- se espera cadena
@@ -584,6 +623,8 @@ class AnalizadorSintactico:
                                         elif token.tipo == "cadena":
                                             archivo = token.lexema
                                             tablaGeneral(fecha1,fecha2,archivo)
+                                            if token is not None:
+                                                self.agregarError("EOF",token.tipo)
                                         else:
                                             self.agregarError("cadena",token.tipo)
                                     else:
@@ -660,6 +701,8 @@ class AnalizadorSintactico:
                                             token = self.sacarToken()
                                             if token is None:
                                                 tablaTop(condicion, fecha1,fecha2,n)
+                                                if token is not None:
+                                                    self.agregarError("EOF",token.tipo)
                                                 return
                                             elif token.tipo == "-n":
                                                 # Sacar otro token --- se espera numero
@@ -670,6 +713,8 @@ class AnalizadorSintactico:
                                                 elif token.tipo == "numero":
                                                     n = token.lexema
                                                     tablaTop(condicion,fecha1,fecha2,n)
+                                                    if token is not None:
+                                                        self.agregarError("EOF",token.tipo)
                                                 else:
                                                     self.agregarError("numero",token.tipo)
                                             else:
@@ -752,6 +797,8 @@ class AnalizadorSintactico:
                                                 return
                                             elif token.tipo == "mayorQue":
                                                 CantidadDeGoles(condicion,equipo,fecha1,fecha2)
+                                                if token is not None:
+                                                    self.agregarError("EOF",token.tipo)
                                             else:
                                                 self.agregarError("mayorQue",token.tipo)
                                         else:
@@ -773,7 +820,7 @@ class AnalizadorSintactico:
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
         x = PrettyTable()
-        x.field_names = ["Descripcion"]
+        x.field_names = ["Descripción"]
         for error_ in self.errores:
             x.add_row([error_])
         return x.get_html_string()            
