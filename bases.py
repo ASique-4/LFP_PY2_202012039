@@ -269,7 +269,13 @@ def imprimir(archivo,tabla):
     strARCHIVO = open(archivo+'.html','w')
     strHTML = '''<!DOCTYPE html>
                 <html>
-                    <head><title>'''+archivo+'''</title></head>
+                
+                    <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>'''+archivo+'''</title>
+                    </head>
                     <style>
                     table, th, td {
                     border: 1px solid rgb(31, 31, 31);
