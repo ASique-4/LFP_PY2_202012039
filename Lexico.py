@@ -21,16 +21,18 @@ class AnalizadorLexico:
 
 
     def agregar_error(self,caracter,linea,columna):
-        self.listaErrores.append(Error('Lexema ' + caracter + ' no reconocido en el lenguaje.', linea, columna))
+        self.listaErrores.append(Error('ERROR LEXICO: Lexema ' + caracter + ' no reconocido en el lenguaje.', linea, columna))
         self.buffer = ''
 
+    #JORNADA 1 TEMPORADA <1996-1997> -f jornada1 Reporte
     def s0(self,caracter : str,cadena):
         '''Estado S0'''
-        if caracter.isalpha():
+        if caracter.isalpha() or (caracter.isdigit() and cadena[self.i + 1] != None and cadena[self.i + 1] != ' ' and cadena[self.i + 1] != '\n' 
+        and cadena[self.i - 1] != None and cadena[self.i - 1].isalpha()) or (caracter.isdigit() and cadena[self.i - 1] != None and cadena[self.i - 1].isalpha()):
             self.estado = 1
             self.buffer += caracter
             self.columna += 1     
-        elif caracter.isdigit():
+        elif caracter.isdigit() :
             self.estado = 4
             self.buffer += caracter
             self.columna += 1               
@@ -47,6 +49,12 @@ class AnalizadorLexico:
             self.buffer += caracter
             self.columna += 1
             self.simbolo = 'mayorQue'      
+        elif caracter == '-' and cadena[self.i + 1] != None and cadena[self.i + 1] == 'n':
+            self.estado = 6
+            self.buffer += caracter + cadena[self.i + 1]
+            self.columna += 1
+            self.i += 1
+            self.simbolo = '-n'
         elif caracter == '-' and cadena[self.i + 1] != None and cadena[self.i + 1] == 'f':
             self.estado = 6
             self.buffer += caracter + cadena[self.i + 1]
@@ -82,9 +90,10 @@ class AnalizadorLexico:
             self.columna += 1
             self.estado = 0
 
-    def s1(self,caracter : str):
+    def s1(self,caracter : str, cadena):
         '''Estado S1'''
-        if caracter.isalpha():
+        if caracter.isalpha() or (caracter.isdigit() and cadena[self.i + 1] != None and cadena[self.i + 1] != ' ' and cadena[self.i + 1] != '\n' 
+        and cadena[self.i - 1] != None and cadena[self.i - 1].isalpha()) or (caracter.isdigit() and cadena[self.i - 1] != None and cadena[self.i - 1].isalpha()):
             self.estado = 1
             self.buffer += caracter
             self.columna += 1                                               
@@ -175,7 +184,7 @@ class AnalizadorLexico:
             if self.estado == 0:
                 self.s0(cadena[self.i],cadena)
             elif self.estado == 1:
-                self.s1(cadena[self.i])
+                self.s1(cadena[self.i],cadena)
             elif self.estado == 2:
                 self.s2(cadena)
             elif self.estado == 4:
@@ -191,12 +200,12 @@ class AnalizadorLexico:
         x.field_names = ["Lexema","Linea","Columna","Tipo"]
         for token in self.listaTokens:
             x.add_row([token.lexema, token.linea, token.columna,token.tipo])
-        print(x)
+        return x.get_html_string()
 
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
         x = PrettyTable()
-        x.field_names = ["Descripcion","Linea","Columna"]
+        x.field_names = ["Descripcion"]
         for error_ in self.listaErrores:
-            x.add_row([error_.descripcion, error_.linea, error_.columna])
-        print(x) 
+            x.add_row([error_.descripcion])
+        return x.get_html_string()

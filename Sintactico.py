@@ -52,6 +52,8 @@ class AnalizadorSintactico:
             self.TABLA_GENERAL()
         elif temporal.tipo == 'reservada_TOP':
             self.TABLA_TOP()
+        elif temporal.tipo == 'reservada_GOLES':
+            self.GOLES()
         elif temporal.tipo == 'reservada_ADIOS':
             print('Nos vemos luego :D')
             sleep(5)
@@ -311,15 +313,21 @@ class AnalizadorSintactico:
                                             elif token.tipo == "cadena":
                                                 archivo = token.lexema
                                                 token = self.sacarToken()
-                                                if token.tipo == "-ji":
+                                                if token is None:
+                                                    obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    return
+                                                elif token.tipo == "-ji":
                                                     # Sacar otro token --- se espera numero
                                                     token = self.sacarToken()
                                                     if token is None:
-                                                        self.agregarError("cadena","EOF")
+                                                        self.agregarError("numero","EOF")
                                                         return
                                                     elif token.tipo == "numero":
                                                         jorIni = token.lexema
                                                         token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
                                                         if token.tipo == "-jf":
                                                             # Sacar otro token --- se espera numero
                                                             token = self.sacarToken()
@@ -330,8 +338,9 @@ class AnalizadorSintactico:
                                                                 jorfin = token.lexema
                                                                 token = self.sacarToken()
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
-                                                                self.agregarError("cadena",token.tipo)
+                                                                self.agregarError("numero",token.tipo)
                                                     else:
                                                         self.agregarError("cadena",token.tipo)
                                                 elif token.tipo == "-jf":
@@ -339,11 +348,14 @@ class AnalizadorSintactico:
                                                     # Sacar otro token --- se espera numero
                                                     token = self.sacarToken()
                                                     if token is None:
-                                                        self.agregarError("cadena","EOF")
+                                                        self.agregarError("numero","EOF")
                                                         return
                                                     elif token.tipo == "numero":
                                                         jorfin = token.lexema
                                                         token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
                                                         if token.tipo == "-ji":
                                                     
                                                             # Sacar otro token --- se espera numero
@@ -354,6 +366,7 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorIni = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
                                                     else:
@@ -369,6 +382,9 @@ class AnalizadorSintactico:
                                             elif token.tipo == "numero":
                                                 jorIni = token.lexema
                                                 token = self.sacarToken()
+                                                if token is None:
+                                                    obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    return
                                                 if token.tipo == "-f":
                                                     # Sacar otro token --- se espera cadena
                                                     token = self.sacarToken()
@@ -378,6 +394,9 @@ class AnalizadorSintactico:
                                                     elif token.tipo == "cadena":
                                                         archivo = token.lexema
                                                         token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
                                                         if token.tipo == "-jf":
                                                             # Sacar otro token --- se espera numero
                                                             token = self.sacarToken()
@@ -387,6 +406,7 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorfin = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
                                                     else:
@@ -415,6 +435,7 @@ class AnalizadorSintactico:
                                                                 archivo = token.lexema
                                                                 token = self.sacarToken()
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
                                                                 self.agregarError("cadena",token.tipo)
                                                     else:
@@ -426,7 +447,11 @@ class AnalizadorSintactico:
                                                 self.agregarError("numero","EOF")
                                                 return
                                             elif token.tipo == "numero":
-                                                archivo = token.lexema
+                                                jorfin = token.lexema
+                                                token = self.sacarToken()
+                                                if token is None:
+                                                    obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                    return
                                                 if token.tipo == "-f":
                                                     # Sacar otro token --- se espera cadena
                                                     token = self.sacarToken()
@@ -436,6 +461,9 @@ class AnalizadorSintactico:
                                                     elif token.tipo == "cadena":
                                                         archivo = token.lexema
                                                         token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
                                                         if token.tipo == "-ji":
                                                             # Sacar otro token --- se espera numero
                                                             token = self.sacarToken()
@@ -445,6 +473,7 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "numero":
                                                                 jorIni = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
                                                                 self.agregarError("numero",token.tipo)
                                                     else:
@@ -459,6 +488,9 @@ class AnalizadorSintactico:
                                                     elif token.tipo == "numero":
                                                         jorIni = token.lexema
                                                         token = self.sacarToken()
+                                                        if token is None:
+                                                            obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                            return
                                                         if token.tipo == "-f":
                                                     
                                                             # Sacar otro token --- se espera cadena
@@ -469,6 +501,7 @@ class AnalizadorSintactico:
                                                             elif token.tipo == "cadena":
                                                                 archivo = token.lexema
                                                                 obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorfin)
+                                                                return
                                                             else:
                                                                 self.agregarError("cadena",token.tipo)
                                                     else:
@@ -490,73 +523,6 @@ class AnalizadorSintactico:
         else:
             self.agregarError("cadena","EOF")                
 
-
-    def LISTA(self):
-        # Producción
-        #            LISTA' ::= VALOR LISTA'
-        #Valor es un str o un int
-        valor = self.VALOR()
-        if valor is None:
-            return
-        
-        lista_ = self.LISTA_()
-        if lista_ is None:
-            return        
-                  #[3]    + [1,3,4]
-                  #[3,1,3,4]
-        return [valor] + lista_
-
-    def LISTA_(self):
-        # Producción
-        #            LISTA' ::= coma VALOR LISTA' | epsilon
-        
-        #Para no perder el token en caso de irnos por epsilon, solo lo observo
-        token = self.observarToken()
-        if token is None:
-            return
-        if token.tipo == 'coma':
-            #Ya se que es una coma entonces si lo saco
-            token = self.sacarToken()
-
-            #Llamamos al no terminal VALOR
-            # Valor retorna un numero o una cadena
-            valor = self.VALOR()
-            #Si el valor es None quiere decir que hubo un error sintactico en VALOR
-            #Entonces seguimos 'subiendo' ese None
-            if valor is None:
-                return
-            
-            lista_prima = self.LISTA_()
-
-            #Si el valor es None quiere decir que hubo un error sintactico en LISTA'    
-            if lista_prima is None:
-                return
-                
-            #Retornamos una lista con lo obtenido en VALOR Y LISTA'
-            return [valor] + lista_prima
-        else:
-            # Como en está producción es posible esperar un epsilon
-            # Voy a retornar una lista vacía en caso de que token.tipo
-            # no     sea una coma, esto para simular el epsilon
-            return []
-    
-
-    def VALOR(self):
-        # Producción
-        #            VALOR ::= cadena | numero
-              
-        token = self.sacarToken()
-        # Si no viene un token retornamos None para
-        # Causar que no se ejecute el comando
-        if token is None:
-            self.agregarError("cadena | entero","EOF") 
-            return
-        if token.tipo == 'cadena':
-            return token.lexema
-        elif token.tipo == 'entero':
-            return int(token.lexema)
-        else:
-            self.agregarError("cadena | entero",token.tipo) 
 
     def TABLA_GENERAL(self):
         # Comando de impresión de tabla general
@@ -693,7 +659,7 @@ class AnalizadorSintactico:
                                             # Sacar otro token --- se espera -n
                                             token = self.sacarToken()
                                             if token is None:
-                                                tablaTop(fecha1,fecha2,n)
+                                                tablaTop(condicion, fecha1,fecha2,n)
                                                 return
                                             elif token.tipo == "-n":
                                                 # Sacar otro token --- se espera numero
@@ -703,7 +669,7 @@ class AnalizadorSintactico:
                                                     return
                                                 elif token.tipo == "numero":
                                                     n = token.lexema
-                                                    tablaTop(fecha1,fecha2,n)
+                                                    tablaTop(condicion,fecha1,fecha2,n)
                                                 else:
                                                     self.agregarError("numero",token.tipo)
                                             else:
@@ -725,10 +691,89 @@ class AnalizadorSintactico:
             else:
                 self.agregarError("reservada_TOP","EOF")       
 
+    def GOLES(self):
+            # Comando de impresión de GOLES 
+        
+            n = 5
+            # Sacar token --- se espera reservada_GOLES
+            token = self.sacarToken()
+            if token.tipo == 'reservada_GOLES':
+                # Sacar otro token --- se espera reservada_LOCAL | reservada_VISITANTE | reservada_TOTAL
+                token = self.sacarToken()
+                if token is None:
+                    self.agregarError("reservada_LOCAL | reservada_VISITANTE | reservada_TOTAL","EOF")
+                    return
+                elif token.tipo == "reservada_LOCAL" or token.tipo == "reservada_VISITANTE" or token.tipo == "reservada_TOTAL" :
+                    condicion = token.tipo
+                    # Sacar otro token --- se espera cadena
+                    token = self.sacarToken()
+                    if token is None:
+                        self.agregarError("cadena","EOF")
+                        return
+                    elif token.tipo == "cadena":
+                        equipo = token.lexema
+                        # Sacar otro token --- se espera reservada_TEMPORADA
+                        token = self.sacarToken()
+                        if token is None:
+                            self.agregarError("reservada_TEMPORADA","EOF")
+                            return
+                        elif token.tipo == "reservada_TEMPORADA":
+                            # Sacar otro token --- se espera menorQue
+                            token = self.sacarToken()
+                            if token is None:
+                                self.agregarError("menorQue","EOF")
+                                return
+                            elif token.tipo == "menorQue":
+                                # Sacar otro token --- se espera numero
+                                token = self.sacarToken()
+                                if token is None:
+                                    self.agregarError("numero","EOF")
+                                    return
+                                elif token.tipo == "numero":
+                                    # Sacar otro token --- se espera guion
+                                    fecha1 = token.lexema
+                                    token = self.sacarToken()
+                                    if token is None:
+                                        self.agregarError("guion","EOF")
+                                        return
+                                    elif token.tipo == "guion":
+                                        
+                                        # Sacar otro token --- se espera numero
+                                        token = self.sacarToken()
+                                        if token is None:
+                                            self.agregarError("numero","EOF")
+                                            return
+                                        elif token.tipo == "numero":
+                                            fecha2 = token.lexema
+                                            # Sacar otro token --- se espera mayorQue
+                                            token = self.sacarToken()
+                                            if token is None:
+                                                self.agregarError("mayorQue","EOF")
+                                                return
+                                            elif token.tipo == "mayorQue":
+                                                CantidadDeGoles(condicion,equipo,fecha1,fecha2)
+                                            else:
+                                                self.agregarError("mayorQue",token.tipo)
+                                        else:
+                                            self.agregarError("numero",token.tipo) 
+                                    else:
+                                        self.agregarError("guion",token.tipo) 
+                                else:
+                                    self.agregarError("numero",token.tipo) 
+                            else:
+                                self.agregarError("menorQue",token.tipo)     
+                        else:
+                            self.agregarError("reservada_TEMPORADA",token.tipo)        
+                    else:
+                        self.agregarError("cadena",token.tipo)
+                else:
+                    self.agregarError("reservada_LOCAL | reservada_VISITANTE | reservada_TOTAL",token.tipo)           
+            else:
+                self.agregarError("reservada_GOLES","EOF")       
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
         x = PrettyTable()
         x.field_names = ["Descripcion"]
         for error_ in self.errores:
             x.add_row([error_])
-        print(x)            
+        return x.get_html_string()            

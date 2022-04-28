@@ -1,8 +1,8 @@
-from ast import Pass
-import json
+
 import webbrowser
 import pandas as pd
-from prettytable import PrettyTable
+from prettytable import *
+
 
 datosPartidos = pd.read_csv('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/[LFP]Proyecto2_202012039/LFP_PY2_202012039/LaLigaBot-LFP.csv')
 def obtenerResultadoDePartido(equipo1,equipo2,fecha1,fecha2):
@@ -35,7 +35,7 @@ def obtenerResultadoDeJornada(jornada,fecha1,fecha2,archivo):
         x.add_column(i,filas[index])
         index += 1
 
-    print('Generando archivo de resultados jornada {} temporada {}-{}'.format(jornada,fecha1,fecha2))
+    print('Generando archivo de resultados jornada {} temporada {}-{}\n'.format(jornada,fecha1,fecha2))
     imprimir(archivo,x.get_html_string())
 
 def obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorFin):
@@ -66,8 +66,8 @@ def obtenerResultadoDeEquipo(equipo,fecha1,fecha2,archivo,jorIni,jorFin):
     for i in columnas:
         x.add_column(i,filas[index])
         index += 1
-    print(x)
-    print('Generando archivo de resultados de temporada {}-{} del {}'.format(fecha1,fecha2,equipo))
+    #print(x)
+    print('Generando archivo de resultados de temporada {}-{} del {}\n'.format(fecha1,fecha2,equipo))
     imprimir(archivo,x.get_html_string())
 
 def tablaGeneral(fecha1,fecha2,archivo):
@@ -118,8 +118,7 @@ def tablaGeneral(fecha1,fecha2,archivo):
 
     x.field_names = ['Equipo','Puntos']
     x.add_rows(E1)
-    #print(x)
-    print('Generando archivo de clasificación de temporada {}-{}'.format(fecha1,fecha2))
+    print('Generando archivo de clasificación de temporada {}-{}\n'.format(fecha1,fecha2))
     imprimir(archivo,x.get_html_string())
 
 def tablaTop(condicion,fecha1,fecha2,n):
@@ -129,6 +128,7 @@ def tablaTop(condicion,fecha1,fecha2,n):
     index = 0
     strE1 = ''
     strE2 = ''
+    filas = ''
     for i in datos['Equipo1']:
         if datos.iloc[index,5] > datos.iloc[index,6]:
             strE1 += "['{}',{}],".format(i,int(3))
@@ -154,7 +154,7 @@ def tablaTop(condicion,fecha1,fecha2,n):
     for i in E1:
         indexj = 0
         for j in E2:
-            if i[0] == j[0]:
+            if str(i[0]).lower() == str(j[0]).lower():
                 i[1] += j[1] 
                 E2.pop(indexj)
             indexj += 1
@@ -170,37 +170,99 @@ def tablaTop(condicion,fecha1,fecha2,n):
     
     if condicion == 'reservada_INFERIOR':
         E1 = sorted(E1, key=lambda E1: E1[1])
-    if condicion == 'reservada_SUPERIOR':
+    elif condicion == 'reservada_SUPERIOR':
         E1 = sorted(E1, key=lambda E1: E1[1], reverse=True)
 
     x.field_names = ['Posicion','Equipo','Puntos']
     i = 1
-    while n >= i:
+    while int(n) >= i:
         filas += "[{},'{}',{}],".format(i,E1[i][0],E1[i][1])
         i += 1
     filas = eval('['+filas[:-1]+']')
     x.add_rows(filas)
+    x.set_style(MSWORD_FRIENDLY)
     if condicion == 'reservada_INFERIOR':
         print('El top inferior de la temporada {}-{} fue: '.format(fecha1,fecha2))
         print(x)
-    if condicion == 'reservada_SUPERIOR':
+        print('\n')
+    elif condicion == 'reservada_SUPERIOR':
         print('El top superior de la temporada {}-{} fue: '.format(fecha1,fecha2))
         print(x)
+        print('\n')
         
+def CantidadDeGoles(condicion,equipo,fecha1,fecha2):
+    datos = (datosPartidos[ (datosPartidos['Temporada'] == (str(fecha1)+'-'+str(fecha2)))])
+
+    index = 0
+    strE1 = ''
+    strE2 = ''
+    if condicion == 'reservada_LOCAL':
+        for i in datos['Equipo1']:
+            if str(i) == str(equipo):
+                strE1 += "['{}',{}],".format(i,int(datos.iloc[index,5]))
+            index += 1
+        index = 0
+        E1 = eval('['+strE1[:-1]+']')
+        for i in E1:
+            indexj = 0
+            for j in E1:
+                if str(i[0]).lower() == str(j[0]).lower() and i != j:
+                    i[1] += j[1]
+                    E1.pop(indexj)
+                indexj +=1
+
+    elif condicion == 'reservada_VISITANTE':
+        for i in datos['Equipo2']:
+            if str(i) == str(equipo):
+                strE1 += "['{}',{}],".format(i,int(datos.iloc[index,6]))
+            index += 1
+        index = 0
+        E1 = eval('['+strE1[:-1]+']')
+        for i in E1:
+            indexj = 0
+            for j in E1:
+                if str(i[0]).lower() == str(j[0]).lower() and i != j:
+                    i[1] += j[1]
+                    E1.pop(indexj)
+                indexj +=1
+
+    elif condicion == 'reservada_TOTAL':
+        for i in datos['Equipo1']:
+            if str(i) == str(equipo):
+                strE1 += "['{}',{}],".format(i,int(datos.iloc[index,5]))
+            index += 1
+        index = 0
+        for i in datos['Equipo2']:
+            if str(i) == str(equipo):
+                strE2 += "['{}',{}],".format(i,int(datos.iloc[index,6]))
+            index += 1
+
+        E1 = eval('['+strE1[:-1]+']')
+        E2 = eval('['+strE2[:-1]+']')
+
+        indexj = 0
+        for i in E1:
+            indexj = 0
+            for j in E2:
+                if i[0] == j[0]:
+                    i[1] += j[1] 
+                    E2.pop(indexj)
+                indexj += 1
+        
+        for i in E1:
+            indexj = 0
+            for j in E1:
+                if str(i[0]).lower() == str(j[0]).lower() and i != j:
+                    i[1] += j[1]
+                    E1.pop(indexj)
+                indexj +=1
+
+    if E1 != [] and E1 != None and E1[1] != None and E1[1][1] != None:
+        print('Los goles anotados por el {} en total en la temporada {}-{} fueron {} \n'.format(equipo,fecha1,fecha2,E1[1][1]))
+    else:
+        print('Algo salio mal :(\n')
 
 
-def insertar(tabla,base,registro):
-    cadena = ''
-    with open("bases.txt",'r+') as file:
-        diccionario = json.loads(file.read())
-        diccionario["bases"][base][tabla].append(list(registro))
-        cadena = json.dumps(diccionario)
-    escribir(cadena)
-    print("Se insertó en la tabla",tabla,"de la base",base,"un registro")
-
-def escribir(cadena):
-    with open("bases.txt",'w') as file:
-        file.write(cadena)
 
 def imprimir(archivo,tabla):
     '''Imprime una tabla en HTML'''
@@ -210,20 +272,22 @@ def imprimir(archivo,tabla):
                     <head><title>'''+archivo+'''</title></head>
                     <style>
                     table, th, td {
-                    border: 1px solid black;
+                    border: 1px solid rgb(31, 31, 31);
                     border-collapse: collapse;
+                    background-color: #000000;
+                    color: #00CED1;
                     }
 
                     th:nth-child(even),td:nth-child(even) {
-                    background-color: #D6EEEE;
+                    background-color: #494949;
                     }
                     </style>
-                    <body>
-                        
+                    <body bgcolor="DarkSlateGray">
+                        <center>
                             '''
 
     strHTML += tabla
-    strHTML += '''    
+    strHTML += '''      </center>
                     </body>
                 </html>'''
     strARCHIVO.write(strHTML)
