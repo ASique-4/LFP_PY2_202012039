@@ -5,7 +5,7 @@ from prettytable import PrettyTable
 from bases import *
 
 class AnalizadorSintactico:
-
+    
     def __init__(self,tokens : list) -> None:
         self.errores = []
         self.tokens = tokens

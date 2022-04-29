@@ -1,4 +1,5 @@
 
+import webbrowser
 from Lexico import AnalizadorLexico
 from Sintactico import AnalizadorSintactico
 import PySimpleGUI as sg
@@ -17,7 +18,6 @@ layout = [
         sg.Button('ENVIAR', button_color=('DarkTurquoise', 'Black'), bind_return_key=True,expand_x=True,expand_y=True)]]
 
 window = sg.Window('La Liga Bot', layout, font=('Helvetica', ' 13'), default_button_element_size=(8,2), use_default_focus=False)
-#PARTIDOS "Real Madrid" TEMPORADA <1999-2000> -ji 1 -jf 18
 while True:    
 
     event, value = window.read()
@@ -35,21 +35,15 @@ while True:
 
 
         lexico.analizar(cadena)
-        #lexico.imprimirTokens()
-        #lexico.imprimirErrores()
-        
-        
-        #Guardar lista de tokens
+
         listaTokens = lexico.listaTokens
 
         tokens += lexico.imprimirTokens()
         
-        #Análisis sintáctico
         sintactico = AnalizadorSintactico(listaTokens)
         sintactico.analizar()
         errores += lexico.imprimirErrores()
         errores += sintactico.imprimirErrores()
-        #sintactico.imprimirErrores()
 
     if event == ('REPORTE DE \nERRORES'): 
         
@@ -64,12 +58,12 @@ while True:
         t = tokens
         imprimir('Reporte de tokens',t)
     if event == ('MANUAL TECNICO'): 
-        pass
+        webbrowser.open('Manual tecnico.pdf')
     if event == ('LIMPIAR LOG\n DE TOKENS'): 
         lexico.listaTokens = []
         tokens = lexico.imprimirTokens()
     if event == ('MANUAL DE\n USUARIO'): 
-        pass
+        webbrowser.open('Manual de usuario.pdf')
         
 
 window.close()

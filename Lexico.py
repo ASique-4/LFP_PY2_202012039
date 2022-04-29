@@ -215,7 +215,7 @@ class AnalizadorLexico:
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
         x1 = PrettyTable()
-        x1.field_names = ["Descripción"]
+        x1.field_names = ["Descripción","Linea","Columna"]
         for error_ in self.listaErrores:
-            x1.add_row([error_.descripcion])
+            x1.add_row([error_.descripcion,error_.linea,error_.columna])
         return x1.get_html_string()
